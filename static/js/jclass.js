@@ -699,7 +699,12 @@ N.html = function()
                 if (typeof initGist == 'function')
                     initGist();
                 if (typeof window.PR.prettyPrint == 'function')
-                    window.PR.prettyPrint();
+                    window.PR.prettyPrint (
+                        (typeof N.getStaticData().prettyPrintCallbackName !== 'undefined' &&
+                        typeof window[N.getStaticData().prettyPrintCallbackName] === 'function')
+                            ? window[N.getStaticData().prettyPrintCallbackName]
+                            : undefined
+                    );
             });
     };
 
