@@ -1,5 +1,5 @@
 <?php
-$limit = $core->limitControl(isset($_GET['lim']) ? $_GET['lim'] : 0 ,20) ? $_GET['lim'] : 20;
+$limit = isset($_GET['lim']) ? $core->limitControl($_GET['lim'], 20) : 20;
 
 $prj = isset($_GET['project']);
 
@@ -25,7 +25,7 @@ $q = empty($_GET['q']) ? '' : htmlentities($_GET['q'],ENT_QUOTES,'UTF-8');
 
 if($prj)
 {
-    $orderby = $orderby == 'time' ? 'groups_bookmarks.time' : $orderby; //per non svelare struttura database
+    $orderby = $orderby == 'time' ? 'groups_bookmarks.time' : $orderby;
     $query = empty($q)
         ?
          array(
@@ -34,7 +34,7 @@ if($prj)
              )
         :
         array(
-                "SELECT groups_bookmarks.hpid, EXTRACT(EPOCH FROM groups_bookmarks.time) AS time, groups_posts.message, groups_posts.to, groups_posts.pid FROM groups_bookmarks INNER JOIN groups_posts ON groups_posts.hpid = groups_bookmarks.hpid WHERE groups_bookmarks.from = ? AND {$orderby} LIKE ? ORDER BY {$orderby} {$order} LIMIT {$limit}",
+                "SELECT groups_bookmarks.hpid, EXTRACT(EPOCH FROM groups_bookmarks.time) AS time, groups_posts.message, groups_posts.to, groups_posts.pid FROM groups_bookmarks INNER JOIN groups_posts ON groups_posts.hpid = groups_bookmarks.hpid WHERE groups_bookmarks.from = ? AND CAST({$orderby} AS TEXT) LIKE ? ORDER BY {$orderby} {$order} LIMIT {$limit}",
                 array($_SESSION['nerdz_id'],"%{$q}%")
              );
 
@@ -52,7 +52,7 @@ else
              )
         :
         array(
-                "SELECT bookmarks.hpid, EXTRACT(EPOCH FROM bookmarks.time) AS time, posts.message, posts.to, posts.pid FROM bookmarks INNER JOIN posts ON posts.hpid = bookmarks.hpid WHERE bookmarks.from = ? AND {$orderby} LIKE ? ORDER BY {$orderby} {$order} LIMIT {$limit}",
+                "SELECT bookmarks.hpid, EXTRACT(EPOCH FROM bookmarks.time) AS time, posts.message, posts.to, posts.pid FROM bookmarks INNER JOIN posts ON posts.hpid = bookmarks.hpid WHERE bookmarks.from = ? AND CAST({$orderby} AS TEXT) LIKE ? ORDER BY {$orderby} {$order} LIMIT {$limit}",
                 array($_SESSION['nerdz_id'],"%{$q}%")
              );
 
@@ -87,7 +87,7 @@ if(is_numeric($limit))
 }
 else
 {
-    if(2 == sscanf($limit,"%d,%d",$a,$b))
+    if(2 == sscanf($_GET['lim'],"%d,%d",$a,$b))
     {
         $next =  $a+20;
         $prev = $a-20;
